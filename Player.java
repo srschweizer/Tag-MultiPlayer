@@ -5,7 +5,7 @@ public class Player {
     private int yLoc = 0;
     private double heading = 0;
     private boolean it = false;
-    private boolean comp = false;
+    private boolean local = false;
     private int id = 0;
 
     private int speed = 2;
@@ -17,6 +17,14 @@ public class Player {
         this.id = id;
 
         setIt(initialIt);
+
+    }
+    public Player() {
+
+        this.xLoc = (int)(Math.random()*800);
+        this.yLoc = (int)(Math.random()*600);
+        this.id = (int)(Math.random()*99999);
+        setIt(false);
 
     }
     public String toString(){
@@ -33,24 +41,19 @@ public class Player {
     public int getY() {
         return yLoc;
     }
+    public boolean getLocal() {
+        return local;
+    }
 
+    public void setLocal(Boolean local) {
+        this.local = local;
+    }
     public boolean getIt() {
         return it;
     }
 
-    public boolean setIt(Boolean it) {
+    public void setIt(Boolean it) {
         this.it = it;
-        if (it)
-            speed = 10;
-        else
-            speed = 30;
-        return it;
-    }
-
-    public void reset() {
-        xLoc = (int) (Math.random() * 400);
-        yLoc = (int) (Math.random() * 400);
-        System.out.println(" new Xloc = " + xLoc);
     }
 
     public double getHeading() {
@@ -76,10 +79,6 @@ public class Player {
         xLoc = (int) (getX() - (speed * Math.sin(Math.toRadians(getHeading()))));
         yLoc = (int) (getY() - (speed * Math.cos(Math.toRadians(getHeading()))));
     }
-
-    public boolean getComp() {
-        return comp;
-    }
     public void doHumanMove(int mx, int my)
     {
         setHeading(mx, my);
@@ -88,47 +87,6 @@ public class Player {
             moveFwd();
         }
         
-    }
-
-    public void doComputerMove(Player otherPlayer) {
-        comp = true;
-        if (it)
-            runTo(otherPlayer);
-        else
-            runAwayFrom(otherPlayer);
-    }
-
-    public void runAwayFrom(Player p) {
-
-         //if close to wall add random ammount to heading
-         //if not close to player add random amount to heading
-         //if close to player go directly away
-        if((Math.abs(xLoc - p.getX())> speed) || (Math.abs(yLoc - p.getY())> speed)){
-            setHeading(p.getX(), p.getY());
-            heading *= -1; //make the hrading run away
-           //ystem.out.println(xLoc + " to " +p.getX() );
-
-
-            moveFwd();
-        }
-    }
-
-    public void runTo(Player p) {
-        if((Math.abs(xLoc - p.getX())> speed) || (Math.abs(yLoc - p.getY())> speed)){
-            setHeading(p.getX(), p.getY());
-           // System.out.println(xLoc + " to " +p.getX() );
-            moveFwd();
-        }
-
-    }
-    public void checkBounds(int minX, int minY,int maxX, int maxY)
-    {
-        if(xLoc > maxX) xLoc = maxX;
-        if(yLoc > maxY) yLoc = maxY;
-        if(xLoc < minX) xLoc = minX;
-        if(yLoc < minY) yLoc = minY;
-    }
-    
-    
+    }  
 
 }

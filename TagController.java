@@ -11,11 +11,12 @@ public class TagController extends TimerTask {
     private final int frameWidth = 900;
     private final int frameHeight = 600;
     private final int frameWallOffset = 50;
-    private boolean gameRunning = false;
+    private boolean gameRunning = true;
     private Player human = new Player(888, 300, 300, false);
     // private Player comp = new Player(debug, 400, 400, true);
     private Vector<Player> netPlayers = new Vector<Player>();
     private NetClient network;
+    private boolean networkBusy = false;
 
     public static void main(String[] args) {// constructs an instance of TagController
         TagController theGame = new TagController();
@@ -23,14 +24,19 @@ public class TagController extends TimerTask {
 
     public TagController() {
 
+        human = new Player();
+        human.setLocal(true);
         timer = new Timer();
-        view = new TagView(debug, frameWidth, frameHeight);
+        view = new TagView(netPlayers, frameWidth, frameHeight,this);
         timer.schedule(this, 0, timerMS);
-        network = new NetClient(netPlayers, human, 2000, view);
+        network = new NetClient(netPlayers, human, 2000, this);
         Thread netWorker = new Thread(network);
         netWorker.start();
+       
 
     }
+    public void setNetworkBusy(boolean busy){ networkBusy = busy;}
+    public boolean getNetworkBusy() { return networkBusy;}
 
     public void getEvents() {
 
@@ -41,31 +47,25 @@ public class TagController extends TimerTask {
             human.doHumanMove(view.getLastX(), view.getLastY());
             
         }
-        if (button.equals("Start")) {
-            gameRunning = true;
+        if (button.equals("Join")) {
             network.join(human);
         }
-        if (button.equals("Stop")) {
-            gameRunning = false;
+        if (button.equals("Leave")) {
+            //make some thing happen on the server
         }
-        if (button.equals("Reset")) {
-           
+        if (button.equals("Exit")) {
+           System.exit(0);
 
         }
 
     }
 
-    /*
-     * public void checkTag() { if (Math.abs(human.getX() - comp.getX()) < 10) if
-     * (Math.abs(human.getY() - comp.getY()) < 10) { if (human.getIt()) {
-     * human.setIt(false); comp.setIt(true); } else { human.setIt(true);
-     * comp.setIt(false); } } }
-     */
-    public void run() {// called every tick
+    public void run() {
 
         getEvents();
         if (gameRunning) {
-
+            view.drawPlayer(human);
+            if(!getNetworkBusy()) for(Player p : netPlayers) view.drawPlayer(p);
             view.repaint();
            
         }

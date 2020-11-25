@@ -8,15 +8,13 @@ public class NetClient implements Runnable {
     private Vector<Player> netPlayers;
     private int myId;
     private Player human;
-    TagView view;
+    TagController control;
 
-    public NetClient(Vector<Player> netPlayers, Player human, int sleepTime, TagView view) {
+    public NetClient(Vector<Player> netPlayers, Player human, int sleepTime, TagController control) {
         this.sleepTime = sleepTime;
         this.netPlayers = netPlayers;
         this.human = human;
-        myId = (int) (Math.random() * 10000);
-        netPlayers.add(human);
-        this.view = view;
+        this.control = control;
     }
 
     public void run() {
@@ -34,13 +32,12 @@ public class NetClient implements Runnable {
     public void updateNetPlayers() {
 
         move(human.getX(), human.getY());
-        System.out.println(requestId(myId));
+        control.setNetworkBusy(true);
         netPlayers.clear();
         for (int count = 0; count < getNetPlayerCount(); count++) {
-
-            view.drawPlayer(requestId((getIdAtIndex(count))));
-
+            netPlayers.add(requestId((getIdAtIndex(count))));
         }
+        control.setNetworkBusy(false);
 
     }
 
@@ -126,14 +123,14 @@ public class NetClient implements Runnable {
         String ret = "notok";
         try {
 
-            System.out.println("Client: " + send);
+            //System.out.println("Client: " + send);
             Socket s = new Socket("67.135.220.132", 80);
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
             out.write(send + "\n");
             out.flush();
             String received = in.readLine();
-            System.out.println("Server: " + received);
+           // System.out.println("Server: " + received);
             ret = received;
             s.close();
 
